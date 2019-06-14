@@ -7,9 +7,6 @@ class DrawingBoard extends React.Component {
     this.state = {
       id: null,
       drawing: false,
-      color: "black",
-      windowHeight: window.innerHeight,
-      windowWidth: window.innerWidth,
       cleared: false,
       username: null,
       userList: []
