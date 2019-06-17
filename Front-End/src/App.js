@@ -3,7 +3,7 @@ import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
 import socketIOClient from 'socket.io-client'
-const socket = socketIOClient('http://10.185.2.208:8080')
+const socket = socketIOClient('http://10.185.3.183:8080')
 
 
 
@@ -36,7 +36,7 @@ class App extends Component {
   login = (e) => {
     let username = e.target.parentElement.children[0].value
     let password = e.target.parentElement.children[1].value
-    fetch('http://localhost:8000/login', {
+    fetch('http://localhost:3003/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -57,14 +57,12 @@ class App extends Component {
         userList: newUserlist
       })
     }})
-    .catch(err => {
-      err.json()
-     })
-  })
+
+  }
 
 
 
-componentDidMount() {
+  componentDidMount() {
   console.log("component did mount")
 
   //listen for events
@@ -81,6 +79,7 @@ componentDidMount() {
 
       })
   })
+}
 
 
   createUser = (e) => {
@@ -88,7 +87,7 @@ componentDidMount() {
     let passField = document.getElementById("create-password-input")
     let username = e.target.parentElement.children[0].value
     let password = e.target.parentElement.children[1].value
-    fetch('http://localhost:8000/register',{
+    fetch('http://localhost:3003/register',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -115,6 +114,14 @@ componentDidMount() {
         {
           this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
+      </div>
+  )
+
+  }
+}
+
+export default App;
+
 
 
 // }
@@ -124,7 +131,7 @@ componentDidMount() {
 //   return (
 //   <div>
 //     <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
-    
+
 //     <div id="chat">
 //       <div id="chat-window">
 //         <div id="output">{this.state.displayText}
@@ -136,10 +143,3 @@ componentDidMount() {
 
 //       </div>
 //     </div>
-  </div>
-  );
-
-  }
-}
-
-export default App;
