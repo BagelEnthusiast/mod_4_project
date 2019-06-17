@@ -4,6 +4,9 @@ const io = require('socket.io')()
 
 
 //setup other required imports
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+const cors = require('cors')
 const morgan = require('morgan')
 const bodyParser = require('body-parser')
 const pg = require('pg')
@@ -18,6 +21,9 @@ const server = app.listen(3003, () => {
 
 //static files
 app.use(express.static('../Front-End/public'))
+app.use(cors())
+
+process.env.SECRET_KEY = 'secret'
 
 
 io.on('connection', (socket) => {
@@ -31,7 +37,7 @@ io.on('connection', (socket) => {
     socket.on('typing', data => {
         socket.broadcast.emit('typing', data)
     })
-  
+
 })
 
 
@@ -46,11 +52,6 @@ app.use(bodyParser.json())
 var connect = "postgres://flatironstudentaccount:learnlovecode@localhost/mod_4_project"
 
 
-
-
-
-
-
 app.use(morgan('short'))
 //app.use(morgan('combined'))
 
@@ -61,22 +62,63 @@ app.get("/", (req, res) => {
 //users routes
 app.get('/users', (req, res) => {
     User.findAll()
-    .then(user => 
+    .then(user =>
         res.json(user))
 })
 
 app.get('/users/:id', (req, res) => {
     // eval(pry.it)
      User.findByPk(req.params.id)
-     .then(user => 
+     .then(user =>
          res.json(user))
  })
 
-app.post('/users', async (req, res) => {
-    let user = await User.create(req.body)
-    res.json(user)
-    // .then(painting => 
-    //     res.json(painting))
+app.post('/login', (req, res) => {
+  User.findOne({
+    where: {
+      username: req.body.username
+    }
+  })
+  .then(user => {
+    if(user) {
+      console.log(user)
+      if(bcrypt.compareSync(req.body.password, user.password)) {
+        let token = jwt.sign(user.dataValues, process.env.SECRET_KEY)
+        res.json({
+          user: user.username,
+          token: token
+        })
+      } else {
+        res.status(400).json({error: 'User doesn\'t exist.'})
+      }
+    }
+  })
+})
+
+app.post('/register', (req, res) => {
+    let userData = {
+      username: req.body.username,
+      password: req.body.password
+    }
+    User.findOne({
+      where: {username: req.body.username}
+    })
+    .then(user => {
+      if(!user) {
+        bcrypt.hash(req.body.password, 10, (err, hash) => {
+          userData.password = hash
+          User.create(userData)
+          .then(user => {
+            res.json({status: user.username + ' registered'})
+          })
+          .catch(err => {
+            res.send('error: ' + err)
+          })
+        })
+      } else {
+        res.json({error: "User already exists."})
+      }
+    })
 })
 
 app.patch('/users/:id', async (req, res) => {
