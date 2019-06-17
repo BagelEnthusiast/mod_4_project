@@ -19,11 +19,17 @@ const server = app.listen(3003, () => {
 //static files
 app.use(express.static('../Front-End/public'))
 
-//socket setup
-// const io = socket(server);
+
 io.on('connection', (socket) => {
-    socket.on('random', payload => {
-        console.log(payload)
+    console.log("made connection", socket.id)
+
+    //listeners
+    socket.on('chat', data => {
+        io.sockets.emit('chat', data)
+    })
+
+    socket.on('typing', data => {
+        socket.broadcast.emit('typing', data)
     })
   
 })

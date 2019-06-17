@@ -1,47 +1,79 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { Component } from "react";
 import './App.css';
-import socketIO from 'socket.io-client'
+import socketIOClient from 'socket.io-client'
+const socket = socketIOClient('http://10.185.2.208:8080')
+//window.io = io
 
-const io = socketIO('http://10.185.0.210:8080')
-window.io = io
-
-io.on('message', payload => {
-  console.log(payload)
-})
-
-// var socket = io.connect('http://localhost:3003')
-
-//vidhi lecture code
-// import socketIO from 'socket.io-client'
-//const io =  socketIO('http://10.185.1.7:3003')
-
-//vidhi ip
-// const io = socketIO('http://10.185.0.210:8080')
-// window.io = io
-
-//io.emit('random', "table tennis*")  test in console
+// io.on('message', payload => {
+//   console.log(payload)
+// })
 
 
-function App() {
+class App extends Component {
+
+  constructor() {
+    console.log("constructor")
+    super()
+    this.state = {
+      displayText: "",
+      feedbackText: ""
+    }
+  }
+
+  // emit events
+  onButtonPress = (handle, text) => {
+    // debugger
+    socket.emit("chat", {
+      message: text,
+      handle: handle
+    })
+  }
+
+  onTyping = (handle) => {
+    socket.emit('typing', handle)
+  }
+
+
+
+componentDidMount() {
+  console.log("component did mount")
+
+  //listen for events
+  socket.on("chat", data => {
+    this.setState({
+      displayText: `${data.handle}: ${data.message}`,
+      feedbackText: ""
+    })
+  })
+
+  socket.on('typing', data => {
+    this.setState({
+      feedbackText: `${data} is typing a message`
+    })
+  })
+
+
+}
+
+  render(){
+    console.log("render")
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+  <div>
+    <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
+    
+    <div id="chat">
+      <div id="chat-window">
+        <div id="output">{this.state.displayText}
+        </div>
+        <div id="feedback">{this.state.feedbackText}</div>
+        <input id="handle" type="text" placeholder="Handle"/>
+        <input onKeyPress={(event) => this.onTyping(event.target.parentElement.children[2].value)} id="message" type="text" placeholder="Message"/>
+        <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
+      </div>
     </div>
+  </div>
   );
+  }
 }
 
 export default App;
