@@ -1,67 +1,80 @@
-import React from 'react';
-import DrawingBoard from './DrawingBoard';
-import Login from './Login';
-import Header from './Header';
 
-// import socketIO from 'socket.io-client'
+import React, { Component } from "react";
+import './App.css';
+import socketIOClient from 'socket.io-client'
+const socket = socketIOClient('http://10.185.2.208:8080')
+//window.io = io
 
-const io = socketIO('http://10.185.0.210:8080')
-window.io = io
-
-io.on('message', payload => {
-  console.log(payload)
-})
-
-// var socket = io.connect('http://localhost:3003')
-
-//vidhi lecture code
-// import socketIO from 'socket.io-client'
-//const io =  socketIO('http://10.185.1.7:3003')
-
-//vidhi ip
-// const io = socketIO('http://10.185.0.210:8080')
-// window.io = io
-
-//io.emit('random', "table tennis*")  test in console
+// io.on('message', payload => {
+//   console.log(payload)
+// })
 
 
+class App extends Component {
 
-
-class App extends React.Component {
-  constructor(){
+  constructor() {
+    console.log("constructor")
     super()
     this.state = {
-      loggedIn: false,
-      user: null,
-      userList: []
+      displayText: "",
+      feedbackText: ""
     }
   }
 
-  login = (user) => {
-    let newUserList = this.state.userList.push(user)
-    this.setState({
-      loggedIn: true,
-      user: user,
-      userList: newUserList
+  // emit events
+  onButtonPress = (handle, text) => {
+    // debugger
+    socket.emit("chat", {
+      message: text,
+      handle: handle
     })
   }
 
-  createUser = (e) => {
-    let username = e.target.parentElement.children[0].value
-    let password = e.target.parentElement.children[1].value
-    let newUser = {username: username, password: password}
-
+  onTyping = (handle) => {
+    socket.emit('typing', handle)
   }
 
-  render() {
-    return (
-      <div>
-        <Header />
-        {
-          this.state.loggedIn ? <DrawingBoard /> : <Login login={this.login} createUser={this.createUser}/>
-        }
+
+
+componentDidMount() {
+  console.log("component did mount")
+
+  //listen for events
+  socket.on("chat", data => {
+    this.setState({
+      displayText: `${data.handle}: ${data.message}`,
+      feedbackText: ""
+    })
+  })
+
+  socket.on('typing', data => {
+    this.setState({
+      feedbackText: `${data} is typing a message`
+    })
+  })
+
+
+}
+
+  render(){
+    console.log("render")
+  return (
+  <div>
+    <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
+    
+    <div id="chat">
+      <div id="chat-window">
+        <div id="output">{this.state.displayText}
+        </div>
+        <div id="feedback">{this.state.feedbackText}</div>
+        <input id="handle" type="text" placeholder="Handle"/>
+        <input onKeyPress={(event) => this.onTyping(event.target.parentElement.children[2].value)} id="message" type="text" placeholder="Message"/>
+        <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
       </div>
-    );
+    </div>
+  </div>
+  );
+
   }
 }
 
