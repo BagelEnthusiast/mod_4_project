@@ -89,8 +89,10 @@ app.post('/login', (req, res) => {
           token: token
         })
       } else {
-        res.status(400).json({error: 'User doesn\'t exist.'})
+        res.status(400).json({error: 'Password doesn\'t match.'})
       }
+    } else {
+      res.status(400).json({error: 'User doesn\'t exist.'})
     }
   })
 })
