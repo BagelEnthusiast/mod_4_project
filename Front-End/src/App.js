@@ -1,13 +1,10 @@
-
 import React, { Component } from "react";
-import './App.css';
+import Dashboard from './Dashboard';
+import Login from './Login';
+import Header from './Header';
 import socketIOClient from 'socket.io-client'
 const socket = socketIOClient('http://10.185.2.208:8080')
-//window.io = io
 
-// io.on('message', payload => {
-//   console.log(payload)
-// })
 
 
 class App extends Component {
@@ -17,7 +14,9 @@ class App extends Component {
     super()
     this.state = {
       displayText: "",
-      feedbackText: ""
+      feedbackText: "",
+      user: null,
+      userList: []
     }
   }
 
@@ -33,6 +32,35 @@ class App extends Component {
   onTyping = (handle) => {
     socket.emit('typing', handle)
   }
+
+  login = (e) => {
+    let username = e.target.parentElement.children[0].value
+    let password = e.target.parentElement.children[1].value
+    fetch('http://localhost:8000/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username, password: password
+      })
+    })
+    .then(res => res.json())
+    .then(obj => {
+      if(obj.error) {
+        alert(obj.error)
+      } else {
+      let newUserlist = this.state.userList
+      newUserlist.push(obj.user)
+      this.setState({
+        user: obj.user,
+        userList: newUserlist
+      })
+    }})
+    .catch(err => {
+      err.json()
+     })
+  })
 
 
 
@@ -50,28 +78,64 @@ componentDidMount() {
   socket.on('typing', data => {
     this.setState({
       feedbackText: `${data} is typing a message`
-    })
+
+      })
   })
 
 
-}
+  createUser = (e) => {
+    let userField = document.getElementById("create-username-input")
+    let passField = document.getElementById("create-password-input")
+    let username = e.target.parentElement.children[0].value
+    let password = e.target.parentElement.children[1].value
+    fetch('http://localhost:8000/register',{
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        username: username, password: password
+      })
+    })
+    .then(res => res.json())
+    .then(user => {
+      if(user.error){
+        alert(user.error);
+      } else
+      {alert('Account created. Please log in to continue.')
+      userField.value = "";
+      passField.value = ""}
+    })
+  }
 
-  render(){
-    console.log("render")
-  return (
-  <div>
-    <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
+  render() {
+    return (
+      <div>
+        <Header />
+        {
+          this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+        }
+
+
+// }
+
+//   render(){
+//     console.log("render")
+//   return (
+//   <div>
+//     <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
     
-    <div id="chat">
-      <div id="chat-window">
-        <div id="output">{this.state.displayText}
-        </div>
-        <div id="feedback">{this.state.feedbackText}</div>
-        <input id="handle" type="text" placeholder="Handle"/>
-        <input onKeyPress={(event) => this.onTyping(event.target.parentElement.children[2].value)} id="message" type="text" placeholder="Message"/>
-        <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
-      </div>
-    </div>
+//     <div id="chat">
+//       <div id="chat-window">
+//         <div id="output">{this.state.displayText}
+//         </div>
+//         <div id="feedback">{this.state.feedbackText}</div>
+//         <input id="handle" type="text" placeholder="Handle"/>
+//         <input onKeyPress={(event) => this.onTyping(event.target.parentElement.children[2].value)} id="message" type="text" placeholder="Message"/>
+//         <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
+
+//       </div>
+//     </div>
   </div>
   );
 

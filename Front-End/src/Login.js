@@ -10,17 +10,17 @@ class Login extends React.Component {
         <h3>Login:</h3>
         <Form className="mb-3" size="lg">
           <Form.Group>
-            <FormControl sz="lg" placeholder="Enter Username"/>
-            <FormControl placeholder="Enter Password"/>
-            <Button type="button">Submit</Button>
+            <FormControl id="login-username-input" sz="lg" placeholder="Enter Username"/>
+            <FormControl type="password" id="login-password-input" placeholder="Enter Password"/>
+            <Button onClick={(e) => this.props.login(e)}type="button">Submit</Button>
           </Form.Group>
         </Form>
         <h3>Or create an account:</h3>
         <Form className="mb-3" size="lg">
           <Form.Group>
-            <FormControl sz="lg" placeholder="Enter Username"/>
-            <FormControl placeholder="Enter Password"/>
-            <Button onClick={(e) => this.props.createUser(e)}type="button">Submit</Button>
+            <FormControl id="create-username-input" sz="lg" placeholder="Enter Username"/>
+            <FormControl type="password" id="create-password-input" placeholder="Enter Password"/>
+            <Button onClick={(e) => this.props.createUser(e)} type="button">Submit</Button>
           </Form.Group>
         </Form>
       </div>
