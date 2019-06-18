@@ -65,6 +65,10 @@ io.on('connection', (socket) => {
         socket.broadcast.emit("playerChange")
     })
 
+    socket.on('mouseUp', () => {
+        socket.broadcast.emit('mouseUp')
+    })
+
 })
 
 

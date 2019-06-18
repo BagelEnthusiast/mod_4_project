@@ -40,8 +40,10 @@ class App extends Component {
     this.setState({
       currentWord: wordsArray[Math.floor(Math.random()*wordsArray.length)]
     }, () => socket.emit("currentWord", this.state.currentWord))
-    
+    socket.emit('clear')
   }
+
+  
 
   onGuess = (word) => {
     if (this.state.currentWord === word) {

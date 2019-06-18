@@ -29,8 +29,11 @@ class DrawingBoard extends React.Component {
 
   mouseUp = () => {
     this.setState({
-      drawing: false
+      drawing: false,
+      canvasX: null,
+      canvasY: null
     })
+    socket.emit('mouseUp')
   }
 
   mouseMove = (e) => {
@@ -64,9 +67,21 @@ class DrawingBoard extends React.Component {
     let drawingboard = document.getElementById('drawingboard')
     let context = drawingboard.getContext("2d")
     if(this.state.drawing) {
-      context.fillRect(x, y, 5, 5)
+      context.beginPath()
+      context.lineWidth = 4;
+      if(this.state.canvasX !== null) {
+        context.moveTo(this.state.canvasX, this.state.canvasY)
+      } else {
+        context.moveTo(x,y)
+      }
+      this.setState({
+        canvasX: x,
+        canvasY: y
+      })
+      context.lineTo(x, y)
+      context.stroke()
 
-      socket.emit('drawing', context.canvas.height, context.canvas.width)
+      socket.emit('drawing', x, y)
 
     }
 
@@ -146,7 +161,27 @@ onTyping = (handle) => {
     socket.on('drawing', (x, y) => {
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
-      context.fillRect(x, y, 5, 5)
+      context.beginPath()
+      context.lineWidth = 4;
+      if(this.state.canvasX !== null) {
+        context.moveTo(this.state.canvasX, this.state.canvasY)
+      } else {
+        context.moveTo(x,y)
+      }
+      this.setState({
+        canvasX: x,
+        canvasY: y
+      })
+      context.lineTo(x, y)
+      context.stroke()
+      
+    })
+
+    socket.on('mouseUp', () => {
+      this.setState({
+        canvasX: null,
+        canvasY: null
+      })
     })
 
 
@@ -179,6 +214,7 @@ onTyping = (handle) => {
         <div>
         <button onClick={this.clearCanvas}>Clear</button>
         <h1>{this.props.currentWord}</h1>
+        <button onClick={this.props.setCurrentWord}>Skip</button>
         </div>
         : 
         <input onChange={(event) => this.props.onGuess(event.target.value)} type="text"/>
