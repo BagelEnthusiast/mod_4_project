@@ -2,9 +2,11 @@ import React, { Component } from "react";
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
-// import socketIOClient from 'socket.io-client'
+
+
 import DrawingBoard from "./DrawingBoard";
-// const socket = socketIOClient('http://10.185.2.208:8080')
+
+
 
 
 
@@ -25,7 +27,7 @@ class App extends Component {
   login = (e) => {
     let username = e.target.parentElement.children[0].value
     let password = e.target.parentElement.children[1].value
-    fetch('http://localhost:8000/login', {
+    fetch('http://localhost:3003/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -41,55 +43,23 @@ class App extends Component {
       } else {
       let newUserlist = this.state.userList
       newUserlist.push(obj.user)
+      localStorage.userToken = obj.token
       this.setState({
         user: obj.user,
         userList: newUserlist
       })
     }})
+
     .catch(err => {
       err.json()
      })
+
+  }
+  componentDidMount() {
+  console.log("component did mount")
+
   }
 
- // emit events
-//  onButtonPress = (handle, text) => {
-//   // debugger
-//   socket.emit("chat", {
-//     message: text,
-//     handle: handle
-//   })
-// }
-
-// onTyping = (handle) => {
-//   socket.emit('typing', handle)
-// }
-
-// onDrawing = (drawing) => {
-//   socket.emit('drawing', drawing)
-// }
-
-// componentDidMount() {
-//   console.log("component did mount")
-
-//   //listen for events
-//   socket.on("chat", data => {
-//     this.setState({
-//       displayText: `${data.handle}: ${data.message}`,
-//       feedbackText: ""
-//     })
-//   })
-
-//   socket.on('typing', data => {
-//     this.setState({
-//       feedbackText: `${data} is typing a message`
-
-//       })
-//   })
-
-//   socket.on('drawing', data => {
-
-//   })
-// }
 
 
   createUser = (e) => {
@@ -97,7 +67,7 @@ class App extends Component {
     let passField = document.getElementById("create-password-input")
     let username = e.target.parentElement.children[0].value
     let password = e.target.parentElement.children[1].value
-    fetch('http://localhost:8000/register',{
+    fetch('http://localhost:3003/register',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -126,7 +96,11 @@ class App extends Component {
           //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
       </div>
+
     );
+
+  )
+
 
   }
 }
@@ -142,7 +116,7 @@ export default App;
 //   return (
 //   <div>
 //     <input type="text" onChange={(e) => this.showText(e.target.value)}></input>
-    
+
 //     <div id="chat">
 //       <div id="chat-window">
 //         <div id="output">{this.state.displayText}
@@ -153,4 +127,8 @@ export default App;
 //         <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
 
 //       </div>
+
 //     </div>
+
+//     </div>
+
