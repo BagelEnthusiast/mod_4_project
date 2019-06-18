@@ -2,8 +2,11 @@ import React, { Component } from "react";
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
-import socketIOClient from 'socket.io-client'
-const socket = socketIOClient('http://10.185.3.183:8080')
+
+
+import DrawingBoard from "./DrawingBoard";
+
+
 
 
 
@@ -13,25 +16,13 @@ class App extends Component {
     console.log("constructor")
     super()
     this.state = {
-      displayText: "",
-      feedbackText: "",
-      user: null,
+     
+      user: "nathan",
       userList: []
     }
   }
 
-  // emit events
-  onButtonPress = (handle, text) => {
-    // debugger
-    socket.emit("chat", {
-      message: text,
-      handle: handle
-    })
-  }
-
-  onTyping = (handle) => {
-    socket.emit('typing', handle)
-  }
+ 
 
   login = (e) => {
     let username = e.target.parentElement.children[0].value
@@ -59,28 +50,16 @@ class App extends Component {
       })
     }})
 
+    .catch(err => {
+      err.json()
+     })
+
   }
-
-
-
   componentDidMount() {
   console.log("component did mount")
 
-  //listen for events
-  socket.on("chat", data => {
-    this.setState({
-      displayText: `${data.handle}: ${data.message}`,
-      feedbackText: ""
-    })
-  })
+  }
 
-  socket.on('typing', data => {
-    this.setState({
-      feedbackText: `${data} is typing a message`
-
-      })
-  })
-}
 
 
   createUser = (e) => {
@@ -113,10 +92,15 @@ class App extends Component {
       <div>
         <Header />
         {
-          this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          this.state.user ? <DrawingBoard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
       </div>
+
+    );
+
   )
+
 
   }
 }
@@ -143,4 +127,8 @@ export default App;
 //         <button id="send" onClick={(event) => this.onButtonPress(event.target.parentElement.children[2].value, event.target.parentElement.children[3].value)}>Send</button>
 
 //       </div>
+
 //     </div>
+
+//     </div>
+
