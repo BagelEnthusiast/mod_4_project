@@ -1,13 +1,16 @@
 import React, { Component } from "react";
-import Dashboard from './Dashboard';
+//import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
 
 
 import DrawingBoard from "./DrawingBoard";
+import socketIOClient from 'socket.io-client'
+
+const socket = socketIOClient('http://10.185.7.204:8080')
 
 
-
+const wordsArray = ["dog", "cat", "cow", "duck", "camel", "house", "whale", "fork", "truck", "hand", "nose", "pizza", "cup", "hamburger", "computer", "building", "boat", "airplane", "car", "monkey", "cloud", "pen", "paper", "book", "television", "shoe"]
 
 
 class App extends Component {
@@ -19,7 +22,8 @@ class App extends Component {
      
       user: "",
       userList: [],
-      currentPainter: false
+      currentPainter: false,
+      currentWord: ""
     }
   }
 
@@ -30,6 +34,22 @@ class App extends Component {
       currentPainter: newPainter
     })
     
+  }
+
+  setCurrentWord = () => {
+    this.setState({
+      currentWord: wordsArray[Math.floor(Math.random()*wordsArray.length)]
+    }, () => socket.emit("currentWord", this.state.currentWord))
+    
+  }
+
+  onGuess = (word) => {
+    if (this.state.currentWord === word) {
+      this.setCurrentWord()
+      this.toggleCurrentPainter()
+      socket.emit("playerChange")
+      
+    }
   }
 
 //  addUserToUserList = (user,callback) => {
@@ -86,7 +106,6 @@ addUserToUserList = (user) => {
         // userList: newUserlist
       })
     }})
-
     .catch(err => {
       
       err.json()
@@ -95,6 +114,15 @@ addUserToUserList = (user) => {
   }
   componentDidMount() {
   console.log("component did mount")
+  socket.on("currentWord", word => {
+    this.setState({
+      currentWord: word
+    })
+  })
+  socket.on("playerChange", () => {
+    this.toggleCurrentPainter()
+    socket.emit('clear')
+  })
 
   }
 
@@ -131,7 +159,7 @@ addUserToUserList = (user) => {
       <div>
         <Header />
         {
-          this.state.user ? <DrawingBoard currentPainter={this.state.currentPainter} toggleCurrentPainter={this.toggleCurrentPainter} updateUserList={this.updateUserList} addUserToUserList={this.addUserToUserList} user={this.state.user} userList={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          this.state.user ? <DrawingBoard onGuess={this.onGuess} setCurrentWord={this.setCurrentWord} currentWord={this.state.currentWord} currentPainter={this.state.currentPainter} toggleCurrentPainter={this.toggleCurrentPainter} updateUserList={this.updateUserList} addUserToUserList={this.addUserToUserList} user={this.state.user} userList={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
           //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
       </div>
@@ -168,4 +196,3 @@ export default App;
 //     </div>
 
 //     </div>
-

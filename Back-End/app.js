@@ -38,9 +38,13 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('typing', data)
     })
 
+    socket.on('clear', () => {
+        console.log("cleared")
+      socket.broadcast.emit('clear')
+    })
 
     socket.on('drawing', (x, y) => {
-       
+
         socket.broadcast.emit('drawing', x, y)
     })
   
@@ -51,6 +55,14 @@ io.on('connection', (socket) => {
     socket.on('requestList', userList => {
         console.log(userList)
         socket.broadcast.emit('receiveUserList', userList)
+    })
+
+    socket.on("currentWord", word => {
+        socket.broadcast.emit('currentWord', word)
+    })
+
+    socket.on("playerChange", () => {
+        socket.broadcast.emit("playerChange")
     })
 
 })

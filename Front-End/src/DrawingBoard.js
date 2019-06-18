@@ -7,8 +7,8 @@ class DrawingBoard extends React.Component {
   constructor(){
     super()
     this.state = {
-      displayText: "",
-      feedbackText: "",
+      // displayText: "",
+      // feedbackText: "",
       id: null,
       drawing: false,
       cleared: false,
@@ -65,11 +65,11 @@ class DrawingBoard extends React.Component {
     let context = drawingboard.getContext("2d")
     if(this.state.drawing) {
       context.fillRect(x, y, 5, 5)
-      
+
       socket.emit('drawing', context.canvas.height, context.canvas.width)
-      
+
     }
-    
+
 
   }
 
@@ -118,6 +118,8 @@ onTyping = (handle) => {
     socket.on('receiveUserList', userList => {
       if ((this.props.userList[0] === this.props.user) && !this.props.currentPainter) {
         this.props.toggleCurrentPainter()
+        this.props.setCurrentWord()
+        
       }
       this.props.updateUserList(userList)
     })
@@ -128,16 +130,20 @@ onTyping = (handle) => {
         feedbackText: ""
       })
     })
-  
+
     socket.on('typing', data => {
       this.setState({
         feedbackText: `${data} is typing a message`
-  
         })
     })
-  
+
+    socket.on('clear', () => {
+      let drawingboard = document.getElementById('drawingboard')
+      let context = drawingboard.getContext("2d")
+      context.clearRect(0, 0, drawingboard.width, drawingboard.height)
+    })
+
     socket.on('drawing', (x, y) => {
-      let canvas = document.getElementById("drawingboard")
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
       context.fillRect(x, y, 5, 5)
@@ -149,18 +155,37 @@ onTyping = (handle) => {
    
   }
 
- 
+  clearCanvas = () => {
+    let drawingboard = document.getElementById('drawingboard')
+    let context = drawingboard.getContext("2d")
+    context.clearRect(0, 0, drawingboard.width, drawingboard.height)
+    socket.emit('clear')
+  }
 
   render() {
     return (
-      <canvas id={"drawingboard"}
-              onMouseDown={this.mouseDown}
-              onMouseUp={this.mouseUp}
-              onMouseMove={(e) => this.mouseMove(e)}
-              width="1000"
-              height="700"
-              ref={this.drawingboard}
-              />
+      <div type="container">
+        <canvas id={"drawingboard"}
+                onMouseDown={this.mouseDown}
+                onMouseUp={this.mouseUp}
+                onMouseMove={(e) => this.mouseMove(e)}
+                width="700"
+                height="500"
+                style={{"border": "3px solid black", "margin": "0 auto"}}
+                ref={this.drawingboard}
+                />
+
+        {this.props.currentPainter ?
+        <div>
+        <button onClick={this.clearCanvas}>Clear</button>
+        <h1>{this.props.currentWord}</h1>
+        </div>
+        : 
+        <input onChange={(event) => this.props.onGuess(event.target.value)} type="text"/>
+        }
+
+      </div>
+
 
     )
   }
