@@ -44,6 +44,14 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('drawing', x, y)
     })
   
+    socket.on('join', (user) => {
+        socket.broadcast.emit('join', user)
+    })
+
+    socket.on('requestList', userList => {
+        console.log(userList)
+        socket.broadcast.emit('receiveUserList', userList)
+    })
 
 })
 

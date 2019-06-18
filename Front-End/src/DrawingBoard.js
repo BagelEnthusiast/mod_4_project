@@ -1,7 +1,7 @@
 import React from "react";
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient('http://10.185.2.208:8080')
+const socket = socketIOClient('http://10.185.7.204:8080')
 
 class DrawingBoard extends React.Component {
   constructor(){
@@ -12,8 +12,8 @@ class DrawingBoard extends React.Component {
       id: null,
       drawing: false,
       cleared: false,
-      username: null,
-      userList: [],
+      // username: null,
+      // userList: [],
       drawingboard: null,
       canvasX: null,
       canvasY: null
@@ -34,6 +34,10 @@ class DrawingBoard extends React.Component {
   }
 
   mouseMove = (e) => {
+    if (!this.props.currentPainter){
+      return
+    }
+
     let drawingboard = document.getElementById('drawingboard')
     let pos = this.getPosition(drawingboard, e);
     let posX = pos.x;
@@ -89,8 +93,35 @@ onTyping = (handle) => {
 
   componentDidMount() {
     console.log("component did mount")
-  
+
+
+  //   this.props.addUserToUserList(this.props.user, 
+  //     () => { if (this.props.userList[0] === this.props.user) {
+  //     this.props.toggleCurrentPainter()
+  //   }
+  //   console.log(this.props.user)
+  //   console.log(this.props.userList)
+  // })
+  this.props.addUserToUserList(this.props.user)
+
+   console.log(this.props.userList)
+    socket.emit('join', this.props.user)
+    
     //listen for events
+    socket.on("join", user => {
+      this.props.addUserToUserList(user)
+      console.log(this.props)
+      console.log(this.props.userList)
+      socket.emit("requestList", this.props.userList)
+    })
+
+    socket.on('receiveUserList', userList => {
+      if ((this.props.userList[0] === this.props.user) && !this.props.currentPainter) {
+        this.props.toggleCurrentPainter()
+      }
+      this.props.updateUserList(userList)
+    })
+
     socket.on("chat", data => {
       this.setState({
         displayText: `${data.handle}: ${data.message}`,
@@ -109,10 +140,16 @@ onTyping = (handle) => {
       let canvas = document.getElementById("drawingboard")
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
-      console.log(x)
       context.fillRect(x, y, 5, 5)
     })
+
+
+    //become current painter if first user
+    
+   
   }
+
+ 
 
   render() {
     return (

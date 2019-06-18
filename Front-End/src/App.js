@@ -17,12 +17,49 @@ class App extends Component {
     super()
     this.state = {
      
-      user: "nathan",
-      userList: []
+      user: "",
+      userList: [],
+      currentPainter: false
     }
   }
 
+  toggleCurrentPainter = () => {
+    
+    let newPainter = !this.state.currentPainter
+    this.setState({
+      currentPainter: newPainter
+    })
+    
+  }
+
+//  addUserToUserList = (user,callback) => {
+//    if (this.state.userList.includes(user)) {
+    
+//      return
+//    }
+//   this.setState({
+//     userList: this.state.userList.concat(user)
+//   }, callback)
  
+//  }
+
+addUserToUserList = (user) => {
+  if (this.state.userList.includes(user)) {
+   
+    return
+  }
+ this.setState({
+   userList: this.state.userList.concat(user)
+ })
+
+}
+
+ updateUserList = (list) => {
+   
+   this.setState({
+     userList: list
+   })
+ }
 
   login = (e) => {
     let username = e.target.parentElement.children[0].value
@@ -41,16 +78,17 @@ class App extends Component {
       if(obj.error) {
         alert(obj.error)
       } else {
-      let newUserlist = this.state.userList
-      newUserlist.push(obj.user)
-      localStorage.userToken = obj.token
+      // let newUserlist = this.state.userList
+      // newUserlist.push(obj.user)
+      //localStorage.userToken = obj.token
       this.setState({
-        user: obj.user,
-        userList: newUserlist
+        user: obj.user
+        // userList: newUserlist
       })
     }})
 
     .catch(err => {
+      
       err.json()
      })
 
@@ -59,6 +97,7 @@ class App extends Component {
   console.log("component did mount")
 
   }
+
 
 
 
@@ -92,14 +131,12 @@ class App extends Component {
       <div>
         <Header />
         {
-          this.state.user ? <DrawingBoard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          this.state.user ? <DrawingBoard currentPainter={this.state.currentPainter} toggleCurrentPainter={this.toggleCurrentPainter} updateUserList={this.updateUserList} addUserToUserList={this.addUserToUserList} user={this.state.user} userList={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
           //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
       </div>
 
     );
-
-  )
 
 
   }
