@@ -4,7 +4,7 @@ import Login from './Login';
 import Header from './Header';
 
 
-import DrawingBoard from "./DrawingBoard";
+// import DrawingBoard from "./DrawingBoard";
 
 
 
@@ -16,13 +16,12 @@ class App extends Component {
     console.log("constructor")
     super()
     this.state = {
-     
-      user: "nathan",
+      user: "",
       userList: []
     }
   }
 
- 
+
 
   login = (e) => {
     let username = e.target.parentElement.children[0].value
@@ -49,7 +48,6 @@ class App extends Component {
         userList: newUserlist
       })
     }})
-
     .catch(err => {
       err.json()
      })
@@ -92,14 +90,14 @@ class App extends Component {
       <div>
         <Header />
         {
-          this.state.user ? <DrawingBoard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
-          //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          //this.state.user ? <DrawingBoard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
       </div>
 
     );
 
-  )
+
 
 
   }
@@ -131,4 +129,3 @@ export default App;
 //     </div>
 
 //     </div>
-

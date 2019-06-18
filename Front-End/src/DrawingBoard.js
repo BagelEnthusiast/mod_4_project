@@ -1,7 +1,7 @@
 import React from "react";
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient('http://10.185.2.208:8080')
+const socket = socketIOClient('http://10.185.6.241:8080')
 
 class DrawingBoard extends React.Component {
   constructor(){
@@ -61,11 +61,11 @@ class DrawingBoard extends React.Component {
     let context = drawingboard.getContext("2d")
     if(this.state.drawing) {
       context.fillRect(x, y, 5, 5)
-      
+
       socket.emit('drawing', context.canvas.height, context.canvas.width)
-      
+
     }
-    
+
 
   }
 
@@ -89,41 +89,55 @@ onTyping = (handle) => {
 
   componentDidMount() {
     console.log("component did mount")
-  
-    //listen for events
+
     socket.on("chat", data => {
       this.setState({
         displayText: `${data.handle}: ${data.message}`,
         feedbackText: ""
       })
     })
-  
+
     socket.on('typing', data => {
       this.setState({
         feedbackText: `${data} is typing a message`
-  
         })
     })
-  
-    socket.on('drawing', (x, y) => {
-      let canvas = document.getElementById("drawingboard")
+
+    socket.on('clear', () => {
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
-      console.log(x)
+      context.clearRect(0, 0, drawingboard.width, drawingboard.height)
+    })
+
+    socket.on('drawing', (x, y) => {
+      let drawingboard = document.getElementById('drawingboard')
+      let context = drawingboard.getContext("2d")
       context.fillRect(x, y, 5, 5)
     })
   }
 
+  clearCanvas = () => {
+    let drawingboard = document.getElementById('drawingboard')
+    let context = drawingboard.getContext("2d")
+    context.clearRect(0, 0, drawingboard.width, drawingboard.height)
+    socket.emit('clear')
+  }
+
   render() {
     return (
-      <canvas id={"drawingboard"}
-              onMouseDown={this.mouseDown}
-              onMouseUp={this.mouseUp}
-              onMouseMove={(e) => this.mouseMove(e)}
-              width="1000"
-              height="700"
-              ref={this.drawingboard}
-              />
+      <div type="container">
+        <canvas id={"drawingboard"}
+                onMouseDown={this.mouseDown}
+                onMouseUp={this.mouseUp}
+                onMouseMove={(e) => this.mouseMove(e)}
+                width="700"
+                height="500"
+                style={{"border": "3px solid black", "margin": "0 auto"}}
+                ref={this.drawingboard}
+                />
+        <button onClick={this.clearCanvas}>Clear</button>
+      </div>
+
 
     )
   }
