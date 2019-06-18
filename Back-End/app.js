@@ -38,12 +38,15 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('typing', data)
     })
 
+    socket.on('clear', () => {
+      socket.broadcast.emit('clear')
+    })
 
     socket.on('drawing', (x, y) => {
-       
+
         socket.broadcast.emit('drawing', x, y)
     })
-  
+
 
 })
 

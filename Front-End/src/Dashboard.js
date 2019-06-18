@@ -7,7 +7,7 @@ class Dashboard extends React.Component {
   constructor(){
     super()
     this.state = {
-      gameNumber: null
+      gameNumber: 1
     }
 
   }
@@ -23,7 +23,7 @@ class Dashboard extends React.Component {
     return(
       <div>
         {
-          this.state.gameNumber ? <DrawingBoard gameNumber={this.state.gameNumber} /> : <EnterGameNumber createOrJoinGame={this.createOrJoinGame}/>
+          this.state.gameNumber ? <DrawingBoard gameNumber={this.state.gameNumber} /> : <EnterGameNumber user={this.props.user} createOrJoinGame={this.createOrJoinGame}/>
         }
       </div>
     )
