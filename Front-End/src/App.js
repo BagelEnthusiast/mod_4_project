@@ -52,6 +52,7 @@ class App extends Component {
       } else {
       let newUserlist = this.state.userList
       newUserlist.push(obj.user)
+      localStorage.userToken = obj.token
       this.setState({
         user: obj.user,
         userList: newUserlist

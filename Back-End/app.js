@@ -98,7 +98,8 @@ app.post('/login', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-    let userData = {
+    if(req.body.username !== "" && req.body.password !== "")
+    {let userData = {
       username: req.body.username,
       password: req.body.password
     }
@@ -120,7 +121,7 @@ app.post('/register', (req, res) => {
       } else {
         res.json({error: "User already exists."})
       }
-    })
+    })}else{res.json({error: "Please enter valid Username and Password"})}
 })
 
 app.patch('/users/:id', async (req, res) => {
