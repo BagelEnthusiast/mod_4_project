@@ -2,8 +2,9 @@ import React, { Component } from "react";
 import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
-import socketIOClient from 'socket.io-client'
-const socket = socketIOClient('http://10.185.2.208:8080')
+// import socketIOClient from 'socket.io-client'
+import DrawingBoard from "./DrawingBoard";
+// const socket = socketIOClient('http://10.185.2.208:8080')
 
 
 
@@ -13,25 +14,13 @@ class App extends Component {
     console.log("constructor")
     super()
     this.state = {
-      displayText: "",
-      feedbackText: "",
-      user: null,
+     
+      user: "nathan",
       userList: []
     }
   }
 
-  // emit events
-  onButtonPress = (handle, text) => {
-    // debugger
-    socket.emit("chat", {
-      message: text,
-      handle: handle
-    })
-  }
-
-  onTyping = (handle) => {
-    socket.emit('typing', handle)
-  }
+ 
 
   login = (e) => {
     let username = e.target.parentElement.children[0].value
@@ -60,27 +49,47 @@ class App extends Component {
     .catch(err => {
       err.json()
      })
-  })
+  }
 
+ // emit events
+//  onButtonPress = (handle, text) => {
+//   // debugger
+//   socket.emit("chat", {
+//     message: text,
+//     handle: handle
+//   })
+// }
 
+// onTyping = (handle) => {
+//   socket.emit('typing', handle)
+// }
 
-componentDidMount() {
-  console.log("component did mount")
+// onDrawing = (drawing) => {
+//   socket.emit('drawing', drawing)
+// }
 
-  //listen for events
-  socket.on("chat", data => {
-    this.setState({
-      displayText: `${data.handle}: ${data.message}`,
-      feedbackText: ""
-    })
-  })
+// componentDidMount() {
+//   console.log("component did mount")
 
-  socket.on('typing', data => {
-    this.setState({
-      feedbackText: `${data} is typing a message`
+//   //listen for events
+//   socket.on("chat", data => {
+//     this.setState({
+//       displayText: `${data.handle}: ${data.message}`,
+//       feedbackText: ""
+//     })
+//   })
 
-      })
-  })
+//   socket.on('typing', data => {
+//     this.setState({
+//       feedbackText: `${data} is typing a message`
+
+//       })
+//   })
+
+//   socket.on('drawing', data => {
+
+//   })
+// }
 
 
   createUser = (e) => {
@@ -113,8 +122,17 @@ componentDidMount() {
       <div>
         <Header />
         {
-          this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          this.state.user ? <DrawingBoard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
         }
+      </div>
+    );
+
+  }
+}
+
+export default App;
+
 
 
 // }
@@ -136,10 +154,3 @@ componentDidMount() {
 
 //       </div>
 //     </div>
-  </div>
-  );
-
-  }
-}
-
-export default App;
