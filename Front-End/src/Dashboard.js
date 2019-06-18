@@ -1,19 +1,30 @@
 import React from 'react';
-import { Form, FormControl, Button } from 'react-bootstrap'
+import EnterGameNumber from './EnterGameNumber'
+import DrawingBoard from './DrawingBoard'
 
 
 class Dashboard extends React.Component {
+  constructor(){
+    super()
+    this.state = {
+      gameNumber: null
+    }
+
+  }
+
+  createOrJoinGame = (e) => {
+    let gameNumber = e.target.parentElement.children[0].value
+    this.setState({
+      gameNumber: gameNumber
+    })
+  }
 
   render(){
     return(
       <div>
-        <h3>Hello {this.props.user ? this.props.user : null}! Create or enter a Game using a Game Number</h3>
-        <Form className="mb-3" size="lg">
-          <Form.Group>
-            <FormControl sz="lg" placeholder="Enter Game Number"/>
-            <Button type="button">Submit</Button>
-          </Form.Group>
-        </Form>
+        {
+          this.state.gameNumber ? <DrawingBoard gameNumber={this.state.gameNumber} /> : <EnterGameNumber createOrJoinGame={this.createOrJoinGame}/>
+        }
       </div>
     )
   }
