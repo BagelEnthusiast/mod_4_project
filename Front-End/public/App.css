@@ -14,12 +14,10 @@ h3 {
 
 .mb-3 {
   width: 50%;
-  align: center;
+  
 }
 
-canvas {
-  align: center;
-}
+
 
 #guess-box {
   display: block;
