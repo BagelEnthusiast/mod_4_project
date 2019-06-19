@@ -1,7 +1,9 @@
 import React from "react";
+import { Container }from 'react-bootstrap'
+
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient('http://10.185.7.204:8080')
+const socket = socketIOClient('http://192.168.1.92:8080')
 
 class DrawingBoard extends React.Component {
   constructor(){
@@ -40,7 +42,6 @@ class DrawingBoard extends React.Component {
     if (!this.props.currentPainter){
       return
     }
-
     let drawingboard = document.getElementById('drawingboard')
     let pos = this.getPosition(drawingboard, e);
     let posX = pos.x;
@@ -80,16 +81,12 @@ class DrawingBoard extends React.Component {
       })
       context.lineTo(x, y)
       context.stroke()
-
       socket.emit('drawing', x, y)
-
     }
-
-
   }
 
    // emit events
- onButtonPress = (handle, text) => {
+onButtonPress = (handle, text) => {
   // debugger
   socket.emit("chat", {
     message: text,
@@ -110,7 +107,7 @@ onTyping = (handle) => {
     console.log("component did mount")
 
 
-  //   this.props.addUserToUserList(this.props.user, 
+  //   this.props.addUserToUserList(this.props.user,
   //     () => { if (this.props.userList[0] === this.props.user) {
   //     this.props.toggleCurrentPainter()
   //   }
@@ -118,10 +115,9 @@ onTyping = (handle) => {
   //   console.log(this.props.userList)
   // })
   this.props.addUserToUserList(this.props.user)
-
-   console.log(this.props.userList)
+   // console.log(this.props.userList)
     socket.emit('join', this.props.user)
-    
+
     //listen for events
     socket.on("join", user => {
       this.props.addUserToUserList(user)
@@ -134,7 +130,7 @@ onTyping = (handle) => {
       if ((this.props.userList[0] === this.props.user) && !this.props.currentPainter) {
         this.props.toggleCurrentPainter()
         this.props.setCurrentWord()
-        
+
       }
       this.props.updateUserList(userList)
     })
@@ -158,6 +154,10 @@ onTyping = (handle) => {
       context.clearRect(0, 0, drawingboard.width, drawingboard.height)
     })
 
+    // socket.on('currentWord', word => {
+    //   this.props.setCurrentWord(word)
+    // })
+
     socket.on('drawing', (x, y) => {
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
@@ -174,7 +174,7 @@ onTyping = (handle) => {
       })
       context.lineTo(x, y)
       context.stroke()
-      
+
     })
 
     socket.on('mouseUp', () => {
@@ -186,8 +186,8 @@ onTyping = (handle) => {
 
 
     //become current painter if first user
-    
-   
+
+
   }
 
   clearCanvas = () => {
@@ -199,7 +199,7 @@ onTyping = (handle) => {
 
   render() {
     return (
-      <div type="container">
+      <Container>
         <canvas id={"drawingboard"}
                 onMouseDown={this.mouseDown}
                 onMouseUp={this.mouseUp}
@@ -216,11 +216,11 @@ onTyping = (handle) => {
         <h1>{this.props.currentWord}</h1>
         <button onClick={this.props.setCurrentWord}>Skip</button>
         </div>
-        : 
-        <input onChange={(event) => this.props.onGuess(event.target.value)} type="text"/>
+        :
+        <input id="guess-box" onChange={(event) => this.props.onGuess(event.target.value)} placeholder="Guess Here!" type="text"/>
         }
 
-      </div>
+      </Container>
 
 
     )
