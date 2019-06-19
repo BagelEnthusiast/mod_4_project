@@ -61,7 +61,7 @@ io.on('connection', (socket) => {
     })
 
     socket.on("currentWord", word => {
-        socket.broadcast.emit('currentWord', word)
+        io.sockets.emit('currentWord', word)
     })
 
     socket.on("playerChange", (user) => {
