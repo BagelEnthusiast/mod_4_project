@@ -2,12 +2,14 @@ import React, { Component } from "react";
 //import Dashboard from './Dashboard';
 import Login from './Login';
 import Header from './Header';
+import { Container }from 'react-bootstrap';
+
 
 
 import DrawingBoard from "./DrawingBoard";
 import socketIOClient from 'socket.io-client'
 
-const socket = socketIOClient('http://10.185.7.204:8080')
+const socket = socketIOClient('http://192.168.1.92:8080')
 
 
 const wordsArray = ["dog", "cat", "cow", "duck", "camel", "house", "whale", "fork", "truck", "hand", "nose", "pizza", "cup", "hamburger", "computer", "building", "boat", "airplane", "car", "monkey", "cloud", "pen", "paper", "book", "television", "shoe"]
@@ -16,11 +18,10 @@ const wordsArray = ["dog", "cat", "cow", "duck", "camel", "house", "whale", "for
 class App extends Component {
 
   constructor() {
-    console.log("constructor")
     super()
     this.state = {
-     
-      user: "",
+
+      user: "chris",
       userList: [],
       currentPainter: false,
       currentWord: ""
@@ -28,12 +29,11 @@ class App extends Component {
   }
 
   toggleCurrentPainter = () => {
-    
     let newPainter = !this.state.currentPainter
     this.setState({
       currentPainter: newPainter
     })
-    
+
   }
 
   setCurrentWord = () => {
@@ -43,31 +43,31 @@ class App extends Component {
     socket.emit('clear')
   }
 
-  
+
 
   onGuess = (word) => {
     if (this.state.currentWord === word) {
       this.setCurrentWord()
       this.toggleCurrentPainter()
       socket.emit("playerChange")
-      
+
     }
   }
 
 //  addUserToUserList = (user,callback) => {
 //    if (this.state.userList.includes(user)) {
-    
+
 //      return
 //    }
 //   this.setState({
 //     userList: this.state.userList.concat(user)
 //   }, callback)
- 
+
 //  }
 
 addUserToUserList = (user) => {
   if (this.state.userList.includes(user)) {
-   
+
     return
   }
  this.setState({
@@ -77,7 +77,7 @@ addUserToUserList = (user) => {
 }
 
  updateUserList = (list) => {
-   
+
    this.setState({
      userList: list
    })
@@ -109,11 +109,12 @@ addUserToUserList = (user) => {
       })
     }})
     .catch(err => {
-      
+
       err.json()
      })
 
   }
+
   componentDidMount() {
   console.log("component did mount")
   socket.on("currentWord", word => {
@@ -160,10 +161,13 @@ addUserToUserList = (user) => {
     return (
       <div>
         <Header />
-        {
-          this.state.user ? <DrawingBoard onGuess={this.onGuess} setCurrentWord={this.setCurrentWord} currentWord={this.state.currentWord} currentPainter={this.state.currentPainter} toggleCurrentPainter={this.toggleCurrentPainter} updateUserList={this.updateUserList} addUserToUserList={this.addUserToUserList} user={this.state.user} userList={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
-          //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
-        }
+        <Container>
+
+          {
+            this.state.user ? <DrawingBoard onGuess={this.onGuess} setCurrentWord={this.setCurrentWord} currentWord={this.state.currentWord} currentPainter={this.state.currentPainter} toggleCurrentPainter={this.toggleCurrentPainter} updateUserList={this.updateUserList} addUserToUserList={this.addUserToUserList} user={this.state.user} userList={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+            //this.state.user ? <Dashboard user={this.state.user} userlist={this.state.userList}/> : <Login login={this.login} createUser={this.createUser}/>
+          }
+        </Container>
       </div>
 
     );
