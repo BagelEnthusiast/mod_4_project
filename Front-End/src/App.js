@@ -22,7 +22,7 @@ class App extends Component {
     super()
     this.state = {
 
-      user: "chris",
+      user: "",
       userList: [],
       currentPainter: "",
       currentWord: "",
