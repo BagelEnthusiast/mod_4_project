@@ -1,4 +1,5 @@
 import React from "react";
+import {Container} from 'react-bootstrap'
 //import socketIOClient from 'window.socket.io-client'
 
 // const window.socket = window.socketIOClient('http://10.185.4.34:8080')
@@ -40,7 +41,6 @@ class DrawingBoard extends React.Component {
     if (this.props.currentPainter !== this.props.user){
       return
     }
-
     let drawingboard = document.getElementById('drawingboard')
     let pos = this.getPosition(drawingboard, e);
     let posX = pos.x;
@@ -84,12 +84,10 @@ class DrawingBoard extends React.Component {
       window.socket.emit('drawing', x, y)
 
     }
-
-
   }
 
    // emit events
- onButtonPress = (handle, text) => {
+onButtonPress = (handle, text) => {
   // debugger
   window.socket.emit("chat", {
     message: text,
@@ -170,7 +168,7 @@ onTyping = (handle) => {
       })
       context.lineTo(x, y)
       context.stroke()
-      
+
     })
 
     window.socket.on('mouseUp', () => {
@@ -182,8 +180,8 @@ onTyping = (handle) => {
 
 
     //become current painter if first user
-    
-   
+
+
   }
 
   clearCanvas = () => {
@@ -195,7 +193,7 @@ onTyping = (handle) => {
 
   render() {
     return (
-      <div type="container">
+      <Container>
         <canvas id={"drawingboard"}
                 onMouseDown={this.mouseDown}
                 onMouseUp={this.mouseUp}
@@ -212,11 +210,11 @@ onTyping = (handle) => {
         <h1>{this.props.currentWord}</h1>
         <button onClick={this.props.setCurrentWord}>Skip</button>
         </div>
-        : 
-        <input onChange={(event) => this.props.onGuess(event.target.value)} type="text"/>
+        :
+        <input id="guess-box" onChange={(event) => this.props.onGuess(event.target.value)} placeholder="Guess Here!" type="text"/>
         }
 
-      </div>
+      </Container>
 
 
     )
