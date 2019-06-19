@@ -1,7 +1,7 @@
 import React from "react";
-import socketIOClient from 'socket.io-client'
+//import socketIOClient from 'window.socket.io-client'
 
-const socket = socketIOClient('http://10.185.7.204:8080')
+// const window.socket = window.socketIOClient('http://10.185.4.34:8080')
 
 class DrawingBoard extends React.Component {
   constructor(){
@@ -33,11 +33,11 @@ class DrawingBoard extends React.Component {
       canvasX: null,
       canvasY: null
     })
-    socket.emit('mouseUp')
+    window.socket.emit('mouseUp')
   }
 
   mouseMove = (e) => {
-    if (!this.props.currentPainter){
+    if (this.props.currentPainter !== this.props.user){
       return
     }
 
@@ -49,7 +49,7 @@ class DrawingBoard extends React.Component {
     this.setState({
       drawingboard: drawingboard
     })
-    if(this.state.drawing) {socket.emit('drawing', posX, posY)}
+    if(this.state.drawing) {window.socket.emit('drawing', posX, posY)}
     //console.log(this.state.drawingboard)
   }
 
@@ -81,7 +81,7 @@ class DrawingBoard extends React.Component {
       context.lineTo(x, y)
       context.stroke()
 
-      socket.emit('drawing', x, y)
+      window.socket.emit('drawing', x, y)
 
     }
 
@@ -91,74 +91,70 @@ class DrawingBoard extends React.Component {
    // emit events
  onButtonPress = (handle, text) => {
   // debugger
-  socket.emit("chat", {
+  window.socket.emit("chat", {
     message: text,
     handle: handle
   })
 }
 
 onTyping = (handle) => {
-  socket.emit('typing', handle)
+  window.socket.emit('typing', handle)
 }
 
 // onDrawing = (drawing) => {
 //   console.log(drawing)
-//   socket.emit('drawing', drawing)
+//   window.socket.emit('drawing', drawing)
 // }
 
-  componentDidMount() {
+  async componentDidMount() {
     console.log("component did mount")
 
 
-  //   this.props.addUserToUserList(this.props.user, 
-  //     () => { if (this.props.userList[0] === this.props.user) {
-  //     this.props.toggleCurrentPainter()
-  //   }
-  //   console.log(this.props.user)
-  //   console.log(this.props.userList)
-  // })
-  this.props.addUserToUserList(this.props.user)
+  //await this.props.addUserToUserList(this.props.user)
 
    console.log(this.props.userList)
-    socket.emit('join', this.props.user)
+    window.socket.emit('join', this.props.username)
     
     //listen for events
-    socket.on("join", user => {
-      this.props.addUserToUserList(user)
-      console.log(this.props)
-      console.log(this.props.userList)
-      socket.emit("requestList", this.props.userList)
+    window.socket.on("join", async (list) => {
+      //await this.props.setCurrentUser(user)
+      await this.props.refreshUserList(list)
+      await this.props.setCurrentWord()
+      await this.props.toggleCurrentPainter()
+      // console.log(this.props)
+      //console.log(this.props.userList)
+      //window.socket.emit("requestList", this.props.userList)
     })
 
-    socket.on('receiveUserList', userList => {
-      if ((this.props.userList[0] === this.props.user) && !this.props.currentPainter) {
-        this.props.toggleCurrentPainter()
-        this.props.setCurrentWord()
+    // window.socket.on('receiveUserList', userList => {
+    //   if ((this.props.userList[0] === this.props.user) && !this.props.currentPainter) {
+    //     this.props.toggleCurrentPainter()
+    //     this.props.setCurrentWord()
         
-      }
-      this.props.updateUserList(userList)
-    })
+    //   }
+    //   this.props.updateUserList(userList)
+    // })
 
-    socket.on("chat", data => {
+    window.socket.on("chat", data => {
       this.setState({
         displayText: `${data.handle}: ${data.message}`,
         feedbackText: ""
       })
     })
 
-    socket.on('typing', data => {
+    window.socket.on('typing', data => {
       this.setState({
         feedbackText: `${data} is typing a message`
         })
     })
 
-    socket.on('clear', () => {
+    window.socket.on('clear', () => {
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
       context.clearRect(0, 0, drawingboard.width, drawingboard.height)
     })
 
-    socket.on('drawing', (x, y) => {
+    window.socket.on('drawing', (x, y) => {
       let drawingboard = document.getElementById('drawingboard')
       let context = drawingboard.getContext("2d")
       context.beginPath()
@@ -177,7 +173,7 @@ onTyping = (handle) => {
       
     })
 
-    socket.on('mouseUp', () => {
+    window.socket.on('mouseUp', () => {
       this.setState({
         canvasX: null,
         canvasY: null
@@ -194,7 +190,7 @@ onTyping = (handle) => {
     let drawingboard = document.getElementById('drawingboard')
     let context = drawingboard.getContext("2d")
     context.clearRect(0, 0, drawingboard.width, drawingboard.height)
-    socket.emit('clear')
+    window.socket.emit('clear')
   }
 
   render() {
@@ -210,7 +206,7 @@ onTyping = (handle) => {
                 ref={this.drawingboard}
                 />
 
-        {this.props.currentPainter ?
+        {this.props.currentPainter === this.props.user ?
         <div>
         <button onClick={this.clearCanvas}>Clear</button>
         <h1>{this.props.currentWord}</h1>

@@ -12,6 +12,7 @@ const bodyParser = require('body-parser')
 const pg = require('pg')
 const pry = require('pryjs')
 const User = require('./models/User')
+let userList = []
 
 //App setup
 const app = express()
@@ -40,7 +41,7 @@ io.on('connection', (socket) => {
 
     socket.on('clear', () => {
         console.log("cleared")
-      socket.broadcast.emit('clear')
+      io.sockets.emit('clear')
     })
 
     socket.on('drawing', (x, y) => {
@@ -48,8 +49,10 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('drawing', x, y)
     })
   
-    socket.on('join', (user) => {
-        socket.broadcast.emit('join', user)
+    socket.on('join', (name) => {
+        
+        userList.push({socket: socket.id, username: name})
+        io.sockets.emit('join', userList)
     })
 
     socket.on('requestList', userList => {
@@ -61,12 +64,18 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('currentWord', word)
     })
 
-    socket.on("playerChange", () => {
-        socket.broadcast.emit("playerChange")
+    socket.on("playerChange", (user) => {
+        io.sockets.emit("playerChange", user)
     })
 
     socket.on('mouseUp', () => {
         socket.broadcast.emit('mouseUp')
+    })
+
+    socket.on('disconnect', () => {
+        console.log('Got disconnect')
+
+        var i = userList.splice(i,1)
     })
 
 })
